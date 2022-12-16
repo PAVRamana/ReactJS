@@ -11,6 +11,8 @@ function Container() {
     {
       id: uuid(),
       data: undefined,
+      name: "textInputName0",
+      textInputName0: undefined,
     },
   ]);
 
@@ -23,6 +25,10 @@ function Container() {
         {
           id: id,
           data: templateData ? templateData : undefined,
+          name: `textInputName${cells?.length}`,
+          [`textInputName${cells?.length}`]: templateData
+            ? templateData
+            : undefined,
         },
       ],
     ]);
@@ -31,9 +37,10 @@ function Container() {
   const onChangeTextArea = (id, data) => {
     const cells = [...cellData];
     setCellData(
-      cells?.map((cell) => {
+      cells?.map((cell, index) => {
         if (cell.id === id) {
           cell.data = data;
+          cell[`textInputName${index}`] = data;
         }
         return cell;
       })
@@ -55,7 +62,11 @@ function Container() {
         return;
       }
       const cells = [...cellData];
-      setCellData(moveCells(cells, selectedCellIndex, selectedCellIndex - 1));
+      setCellData(
+        reArrangeDataIndex(
+          moveCells(cells, selectedCellIndex, selectedCellIndex - 1)
+        )
+      );
       setSelectedCellIndex(selectedCellIndex - 1);
     }
   };
@@ -66,9 +77,29 @@ function Container() {
         return;
       }
       const cells = [...cellData];
-      setCellData(moveCells(cells, selectedCellIndex, selectedCellIndex + 1));
+      setCellData(
+        reArrangeDataIndex(
+          moveCells(cells, selectedCellIndex, selectedCellIndex + 1)
+        )
+      );
       setSelectedCellIndex(selectedCellIndex + 1);
     }
+  };
+
+  const reArrangeDataIndex = (cellInfo) => {
+    return cellInfo?.map((item, index) => {
+      item.name = `textInputName${index}`;
+      let existingDataKey;
+      Object.keys(item).forEach((key) => {
+        if (key.indexOf("textInputName") !== -1) {
+          existingDataKey = key;
+        }
+      });
+      const existingData = item[existingDataKey];
+      delete item[existingDataKey];
+      item[`textInputName${index}`] = existingData;
+      return item;
+    });
   };
 
   const onCellUpClick = () => {
@@ -78,28 +109,36 @@ function Container() {
     const cells = [...cellData];
     selectedCellIndex === 0
       ? setCellData(
-          [
-            {
-              id: uuid(),
-              data: undefined,
-            },
-          ].concat(cells)
+          reArrangeDataIndex(
+            [
+              {
+                id: uuid(),
+                data: undefined,
+                name: "textInputName0",
+                textInputName0: undefined,
+              },
+            ].concat(cells)
+          )
         )
       : insertCellAtPosition(cells, selectedCellIndex);
     preSelectCell(selectedCellIndex);
   };
 
   const insertCellAtPosition = (cells, selectedIndex) => {
-    setCellData([
-      ...cells?.slice(0, selectedIndex),
-      ...[
-        {
-          id: uuid(),
-          data: undefined,
-        },
-      ],
-      ...cells?.slice(selectedIndex),
-    ]);
+    setCellData(
+      reArrangeDataIndex([
+        ...cells?.slice(0, selectedIndex),
+        ...[
+          {
+            id: uuid(),
+            data: undefined,
+            name: "textInputName0",
+            textInputName0: undefined,
+          },
+        ],
+        ...cells?.slice(selectedIndex),
+      ])
+    );
   };
 
   const onCellDownClick = () => {
@@ -109,12 +148,16 @@ function Container() {
     const cells = [...cellData];
     selectedCellIndex === cells?.length - 1
       ? setCellData(
-          cells?.concat([
-            {
-              id: uuid(),
-              data: undefined,
-            },
-          ])
+          reArrangeDataIndex(
+            cells?.concat([
+              {
+                id: uuid(),
+                data: undefined,
+                name: "textInputName0",
+                textInputName0: undefined,
+              },
+            ])
+          )
         )
       : insertCellAtPosition(cells, selectedCellIndex + 1);
     preSelectCell(selectedCellIndex + 1);
@@ -125,10 +168,14 @@ function Container() {
       const cells = [...cellData];
       setCellData(
         cells?.map((item, index) => {
-          item.data =
-            index === selectedCellIndex
-              ? `${item.data ? item.data : ""}  ${values?.snippet}`?.trim()
-              : item.data;
+          if (index === selectedCellIndex) {
+            const updatedData = `${item.data ? item.data : ""}  ${
+              values?.snippet
+            }`?.trim();
+            item.data = updatedData;
+            item[`textInputName${index}`] = updatedData;
+            return item;
+          }
           return item;
         })
       );
