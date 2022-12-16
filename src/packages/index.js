@@ -2,6 +2,7 @@ import TextareaCmp from "./text-area";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import ButtonCmp from "./button";
+import SnippetCombo from "./snippet-combo";
 import "./index.css";
 
 function Container() {
@@ -13,7 +14,7 @@ function Container() {
     },
   ]);
 
-  const onClickAdd = () => {
+  const onClickAdd = (templateData) => {
     const cells = [...cellData];
     const id = uuid();
     setCellData([
@@ -21,7 +22,7 @@ function Container() {
       ...[
         {
           id: id,
-          data: undefined,
+          data: templateData ? templateData : undefined,
         },
       ],
     ]);
@@ -40,7 +41,7 @@ function Container() {
   };
 
   const moveCells = (cells, currentIndex, prevOrNextIndex) => {
-    cells[currentIndex] = cells.splice(
+    cells[currentIndex] = cells?.splice(
       prevOrNextIndex,
       1,
       cells[currentIndex]
@@ -70,14 +71,93 @@ function Container() {
     }
   };
 
+  const onCellUpClick = () => {
+    if (selectedCellIndex === "") {
+      return;
+    }
+    const cells = [...cellData];
+    selectedCellIndex === 0
+      ? setCellData(
+          [
+            {
+              id: uuid(),
+              data: undefined,
+            },
+          ].concat(cells)
+        )
+      : insertCellAtPosition(cells, selectedCellIndex);
+    preSelectCell(selectedCellIndex);
+  };
+
+  const insertCellAtPosition = (cells, selectedIndex) => {
+    setCellData([
+      ...cells?.slice(0, selectedIndex),
+      ...[
+        {
+          id: uuid(),
+          data: undefined,
+        },
+      ],
+      ...cells?.slice(selectedIndex),
+    ]);
+  };
+
+  const onCellDownClick = () => {
+    if (selectedCellIndex === "") {
+      return;
+    }
+    const cells = [...cellData];
+    selectedCellIndex === cells?.length - 1
+      ? setCellData(
+          cells?.concat([
+            {
+              id: uuid(),
+              data: undefined,
+            },
+          ])
+        )
+      : insertCellAtPosition(cells, selectedCellIndex + 1);
+    preSelectCell(selectedCellIndex + 1);
+  };
+
+  const onSelectSnippetCombo = (values) => {
+    if (selectedCellIndex !== "") {
+      const cells = [...cellData];
+      setCellData(
+        cells?.map((item, index) => {
+          item.data =
+            index === selectedCellIndex
+              ? `${item.data ? item.data : ""}  ${values?.snippet}`?.trim()
+              : item.data;
+          return item;
+        })
+      );
+    } else {
+      onClickAdd(values?.snippet);
+    }
+  };
+
+  const preSelectCell = (selectedIndex) => {
+    setSelectedCellIndex("");
+    setTimeout(() => {
+      setSelectedCellIndex(selectedIndex);
+    }, 0);
+  };
+
   return (
     <>
-      <div className="center">
+      <div
+        className="center"
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
         <ButtonCmp
           onClickAdd={onClickAdd}
           onClickUp={onClickUp}
           onClickDown={onClickDown}
+          onCellDownClick={onCellDownClick}
+          onCellUpClick={onCellUpClick}
         />
+        <SnippetCombo onSelectCombo={onSelectSnippetCombo} />
       </div>
       <div className="center">
         <div>
@@ -100,6 +180,7 @@ function Container() {
                       data={item.data}
                       onChangeTextArea={onChangeTextArea}
                       autoSelect={selectedCellIndex === index}
+                      resetSelectedCell={() => {}}
                     />
                   </div>
                 </div>
