@@ -7,10 +7,10 @@ import "./index.css";
 
 function Container() {
   const [selectedCellIndex, setSelectedCellIndex] = useState("");
+
   const [cellData, setCellData] = useState([
     {
       id: uuid(),
-      data: undefined,
       name: "textInputName0",
       textInputName0: undefined,
     },
@@ -24,7 +24,6 @@ function Container() {
       ...[
         {
           id: id,
-          data: templateData ? templateData : undefined,
           name: `textInputName${cells?.length}`,
           [`textInputName${cells?.length}`]: templateData
             ? templateData
@@ -39,13 +38,14 @@ function Container() {
     setCellData(
       cells?.map((cell, index) => {
         if (cell.id === id) {
-          cell.data = data;
           cell[`textInputName${index}`] = data;
         }
         return cell;
       })
     );
   };
+
+  console.log(cellData);
 
   const moveCells = (cells, currentIndex, prevOrNextIndex) => {
     cells[currentIndex] = cells?.splice(
@@ -113,7 +113,6 @@ function Container() {
             [
               {
                 id: uuid(),
-                data: undefined,
                 name: "textInputName0",
                 textInputName0: undefined,
               },
@@ -131,7 +130,6 @@ function Container() {
         ...[
           {
             id: uuid(),
-            data: undefined,
             name: "textInputName0",
             textInputName0: undefined,
           },
@@ -152,7 +150,6 @@ function Container() {
             cells?.concat([
               {
                 id: uuid(),
-                data: undefined,
                 name: "textInputName0",
                 textInputName0: undefined,
               },
@@ -164,23 +161,28 @@ function Container() {
   };
 
   const onSelectSnippetCombo = (values) => {
+    if (!values) {
+      return;
+    }
     if (selectedCellIndex !== "") {
       const cells = [...cellData];
       setCellData(
         cells?.map((item, index) => {
           if (index === selectedCellIndex) {
-            const updatedData = `${item.data ? item.data : ""}  ${
+            const existingData = item[`textInputName${index}`];
+            const updatedData = `${existingData ? existingData : ""} ${
               values?.snippet
             }`?.trim();
-            item.data = updatedData;
             item[`textInputName${index}`] = updatedData;
             return item;
           }
           return item;
         })
       );
+      preSelectCell(selectedCellIndex);
     } else {
       onClickAdd(values?.snippet);
+      preSelectCell(cellData?.length);
     }
   };
 
@@ -224,7 +226,7 @@ function Container() {
                   <div style={{ padding: "10px" }}>
                     <TextareaCmp
                       id={item.id}
-                      data={item.data}
+                      data={item[`textInputName${index}`]}
                       onChangeTextArea={onChangeTextArea}
                       autoSelect={selectedCellIndex === index}
                       resetSelectedCell={() => {}}
