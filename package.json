@@ -1,32 +1,62 @@
 {
-  "name": "jupyter",
+  "name": "exp-request-ui-plugin",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@material-ui/core": "^4.12.4",
-    "@mui/icons-material": "^5.10.16",
-    "@mui/material": "^5.10.16",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.21.1",
+    "dayjs": "^1.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^7.2.6",
+    "react-select": "^5.8.0",
+    "@tanstack/react-query": "^5.40.1",
+    "@tanstack/react-table": "^8.17.3",
+    "redux": "^4.1.2"
+  },
+  "devDependencies": {
+    "@reduxjs/toolkit": "^1.9.3",
+    "@types/lodash": "^4.14.181",
+    "@types/node": "^16.11.25",
+    "@types/react": "^18.2.57",
+    "@types/react-dom": "^18.2.18",
+    "@types/react-redux": "^7.1.22",
+    "@types/styled-components": "^5.1.29",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "lodash": "^4.17.21",
+    "msw": "^0.36.8",
+    "npm": "^8.15.1",
+    "prettier": "^3.1.1",
     "react-scripts": "5.0.1",
-    "uuidv4": "^6.2.13",
-    "web-vitals": "^2.1.4"
+    "sass": "^1.69.4",
+    "styled-components": "^6.1.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-sass-guidelines": "^8.0.0",
+    "typescript": "^5.3.3",
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+    "lint": "eslint src --fix --ext .ts,.tsx",
+    "pretty": "prettier --write \"**/*.{json,ts,tsx}\"",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "prepush": "npm run lint"
+   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -40,5 +70,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

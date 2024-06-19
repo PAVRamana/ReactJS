@@ -1,0 +1,5 @@
+.elslint*
+build
+public
+lib
+scripts
